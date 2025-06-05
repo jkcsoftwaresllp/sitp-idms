@@ -1,0 +1,16 @@
+openapi: 3.0.3
+info:
+  title: IDMS
+  description: Comprehensive API for IDMS
+  version: 1.2.1
+  contact:
+    name: JKCSoftwares
+    email: support@jkcsoftwares.com
+
+paths:
+  # Include domain-specific paths
+  /operational/v1:
+    $ref: './operational/v1/operational.yaml'
+
+components:
+  $ref: './shared/components/index.yaml'

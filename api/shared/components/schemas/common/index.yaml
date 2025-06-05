@@ -1,0 +1,70 @@
+PaginationMeta:
+  type: object
+  properties:
+    current_page:
+      type: integer
+      example: 1
+    per_page:
+      type: integer
+      example: 20
+    total:
+      type: integer
+      example: 150
+    total_pages:
+      type: integer
+      example: 8
+    has_next:
+      type: boolean
+      example: true
+    has_prev:
+      type: boolean
+      example: false
+
+BaseEntity:
+  type: object
+  properties:
+    created_at:
+      type: string
+      format: date-time
+      readOnly: true
+    updated_at:
+      type: string
+      format: date-time
+      readOnly: true
+    created_by:
+      type: string
+      readOnly: true
+    updated_by:
+      type: string
+      readOnly: true
+
+ErrorResponse:
+  type: object
+  properties:
+    error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "Validation failed"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+SuccessResponse:
+  type: object
+  properties:
+    message:
+      type: string
+      example: "Operation completed successfully"
+    data:
+      type: object

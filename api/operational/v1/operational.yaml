@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: Your API
+  description: API for your complex system
+  version: 1.0.0
+  contact:
+    name: Your Team
+    email: team@yourcompany.com
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+  - url: https://api.yourapp.com/v1
+    description: Production server
+
+paths:
+  # User routes
+  /users:
+    $ref: './paths/users/users.yaml'
+  /users/{userId}:
+    $ref: './paths/users/users-id.yaml'
+  
+  # Post routes  
+  /posts:
+    $ref: './paths/posts/posts.yaml'
+
+components:
+  schemas:
+    User:
+      $ref: './components/schemas/User.yaml'
+    Post:
+      $ref: './components/schemas/Post.yaml'
+    Error:
+      $ref: './components/schemas/common/Error.yaml'
+    ApiResponse:
+      $ref: './components/schemas/common/ApiResponse.yaml'
+  
+  responses:
+    $ref: './components/responses/common.yaml'
+  
+  parameters:
+    $ref: './components/parameters/common.yaml'
+  
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
