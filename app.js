@@ -1,6 +1,6 @@
 // Imports
 import express from 'express';
-// import userRoutes from './src/modules/operations/routes/users.route.js';
+import  organizationRoutes from './src/modules/operations/routes/organizationRoutes.js';
 
 // Variables
 const PORT = process.env.PORT || 8000;
@@ -11,7 +11,7 @@ const app = express();
 express.json();
 
 // Routes
-// app.use('/api/v1/operations/users', userRoutes);
+ app.use('/api/v1/operations/organizations',organizationRoutes );
 
 // Start
 app.listen(PORT, () => {
