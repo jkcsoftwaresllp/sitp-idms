@@ -1,3 +1,51 @@
+import { eq, desc } from 'drizzle-orm';
+import { db } from '../../../../shared/config/database.js';
+import { productVariants } from '../../../../shared/schema/index.js';
+
+export const getAllVariants = async () => {
+  return await db.select().from(productVariants).orderBy(desc(productVariants.created_at));
+};
+
+export const getVariantsByProductId = async (productId) => {
+  return await db.select().from(productVariants).where(eq(productVariants.product_id, productId));
+};
+
+export const getVariantById = async (id) => {
+  const [variant] = await db.select().from(productVariants).where(eq(productVariants.variant_id, id));
+  if (!variant) {
+    throw new Error('Product variant not found');
+  }
+  return variant;
+};
+
+export const createVariant = async (variantData) => {
+  const [variant] = await db.insert(productVariants).values(variantData).returning();
+  return variant;
+};
+
+export const updateVariant = async (id, variantData) => {
+  const [updatedVariant] = await db
+    .update(productVariants)
+    .set(variantData)
+    .where(eq(productVariants.variant_id, id))
+    .returning();
+
+  if (!updatedVariant) {
+    throw new Error('Product variant not found');
+  }
+  
+  return updatedVariant;
+};
+
+export const deleteVariant = async (id) => {
+  const result = await db.delete(productVariants).where(eq(productVariants.variant_id, id));
+  if (result.affectedRows === 0) {
+    throw new Error('Product variant not found');
+  }
+  return { message: 'Product variant deleted successfully' };
+};
+
+// ===== src/modules/operations/catalog/controllers/productController.js =====
 import * as productService from '../services/productService.js';
 
 export const getAllProducts = async (req, res) => {

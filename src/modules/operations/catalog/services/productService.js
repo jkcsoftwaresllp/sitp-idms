@@ -1,29 +1,51 @@
+import { eq, desc } from 'drizzle-orm';
 import { db } from '../../../../shared/config/database.js';
-import { products, productVariants } from '../schema/productSchema.js';
-import { eq } from 'drizzle-orm';
+import { products } from '../../../../shared/schema/index.js';
 
-export const createProduct = async (data) => {
-  const [product] = await db.insert(products).values(data).returning();
+export const getAllProducts = async () => {
+  return await db.select().from(products).orderBy(desc(products.created_at));
+};
+
+export const getProductById = async (id) => {
+  const [product] = await db.select().from(products).where(eq(products.product_id, id));
+  if (!product) {
+    throw new Error('Product not found');
+  }
   return product;
 };
 
-export const getAllProducts = async () => {
-  return await db.select().from(products);
+export const createProduct = async (productData) => {
+  const [product] = await db.insert(products).values({
+    ...productData,
+    created_by: productData.created_by || null,
+    updated_by: productData.created_by || null
+  }).returning();
+  
+  return product;
 };
 
-export const updateProduct = async (id, data) => {
-  return await db.update(products).set(data).where(eq(products.product_id, id));
+export const updateProduct = async (id, productData) => {
+  const [updatedProduct] = await db
+    .update(products)
+    .set({
+      ...productData,
+      updated_by: productData.updated_by || null,
+      updated_at: new Date()
+    })
+    .where(eq(products.product_id, id))
+    .returning();
+
+  if (!updatedProduct) {
+    throw new Error('Product not found');
+  }
+  
+  return updatedProduct;
 };
 
 export const deleteProduct = async (id) => {
-  return await db.delete(products).where(eq(products.product_id, id));
-};
-
-export const createProductVariant = async (data) => {
-  const [variant] = await db.insert(productVariants).values(data).returning();
-  return variant;
-};
-
-export const getVariantsByProductId = async (productId) => {
-  return await db.select().from(productVariants).where(eq(productVariants.product_id, productId));
+  const result = await db.delete(products).where(eq(products.product_id, id));
+  if (result.affectedRows === 0) {
+    throw new Error('Product not found');
+  }
+  return { message: 'Product deleted successfully' };
 };
