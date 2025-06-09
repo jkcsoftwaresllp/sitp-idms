@@ -1,11 +1,18 @@
-const express = require('express');
+import express from 'express';
+import {
+  fetchSuppliers,
+  createSupplier,
+  updateSupplier,
+  deleteSupplier,
+  getSupplierById
+} from '../controllers/supplierController.js';
+
 const router = express.Router();
-const supplierController = require('../controllers/supplierController');
 
-router.get('/', supplierController.getAllSuppliers);
-router.get('/:id', supplierController.getSupplierById);
-router.post('/', supplierController.createSupplier);
-router.put('/:id', supplierController.updateSupplier);
-router.delete('/:id', supplierController.deleteSupplier);
+router.get('/', fetchSuppliers);         
+router.get('/:id', getSupplierById);     
+router.post('/', createSupplier);         
+router.put('/:id', updateSupplier);       
+router.delete('/:id', deleteSupplier);    
 
-module.exports = router;
+export default router;

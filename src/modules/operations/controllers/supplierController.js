@@ -1,42 +1,39 @@
-const db = require('../config/db');
+import * as service from '../services/supplierService.js';
 
-exports.getAllSuppliers = (req, res) => {
-  db.query('SELECT * FROM suppliers', (err, results) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json(results);
-  });
+export const fetchSuppliers = async (req, res, next) => {
+  try {
+    const data = await service.getSuppliers();
+    res.json(data);
+  } catch (e) { next(e); }
 };
 
-exports.getSupplierById = (req, res) => {
-  const { id } = req.params;
-  db.query('SELECT * FROM suppliers WHERE supplier_id = ?', [id], (err, results) => {
-    if (err) return res.status(500).json({ error: err });
-    if (results.length === 0) return res.status(404).json({ message: 'Supplier not found' });
-    res.json(results[0]);
-  });
+export const getSupplierById = async (req, res, next) => {
+  try {
+    const supplier = await service.getSupplierById(req.params.id);
+    if (!supplier) return res.status(404).json({ message: 'Supplier not found' });
+    res.json(supplier);
+  } catch (e) { next(e); }
 };
 
-exports.createSupplier = (req, res) => {
-  const supplier = req.body;
-  db.query('INSERT INTO suppliers SET ?', supplier, (err, result) => {
-    if (err) return res.status(500).json({ error: err });
-    res.status(201).json({ message: 'Supplier created', supplier_id: result.insertId });
-  });
+export const createSupplier = async (req, res, next) => {
+  try {
+    const newSupplier = await service.addSupplier(req.body);
+    res.status(201).json(newSupplier);
+  } catch (e) { next(e); }
 };
 
-exports.updateSupplier = (req, res) => {
-  const { id } = req.params;
-  const updates = req.body;
-  db.query('UPDATE suppliers SET ? WHERE supplier_id = ?', [updates, id], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json({ message: 'Supplier updated' });
-  });
+export const updateSupplier = async (req, res, next) => {
+  try {
+    const updated = await service.updateSupplier(req.params.id, req.body);
+    if (!updated) return res.status(404).json({ message: 'Supplier not found' });
+    res.json(updated);
+  } catch (e) { next(e); }
 };
 
-exports.deleteSupplier = (req, res) => {
-  const { id } = req.params;
-  db.query('DELETE FROM suppliers WHERE supplier_id = ?', [id], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
+export const deleteSupplier = async (req, res, next) => {
+  try {
+    const deleted = await service.deleteSupplier(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Supplier not found' });
     res.json({ message: 'Supplier deleted' });
-  });
+  } catch (e) { next(e); }
 };
