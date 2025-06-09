@@ -1,70 +1,57 @@
-import db from '../config/db.js';
+import * as transportService from '../services/transportServices.js';
 
 // CREATE
-export const createPartner = (req, res) => {
-  const partner = req.body;
-  const sql = `INSERT INTO transport_partner
-    (name, business_name, contact_person, phone, alternate_phone, email, address_line, city, state, pin_code,
-     pan_number, gst_number, vehicle_details, rate_per_km, base_rate, is_active, created_at, updated_at, created_by, updated_by) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)`;
-
-  const values = [
-    partner.name, partner.business_name, partner.contact_person, partner.phone, partner.alternate_phone,
-    partner.email, partner.address_line, partner.city, partner.state, partner.pin_code,
-    partner.pan_number, partner.gst_number, JSON.stringify(partner.vehicle_details), partner.rate_per_km,
-    partner.base_rate, partner.is_active, partner.created_by, partner.updated_by
-  ];
-
-  db.query(sql, values, (err, result) => {
-    if (err) return res.status(500).send(err);
-    res.status(201).json({ id: result.insertId, message: 'Partner created' });
-  });
+export const createPartner = async (req, res) => {
+  try {
+    const id = await partnerService.createPartner(req.body);
+    res.status(201).json({ id, message: 'Partner created successfully' });
+  } catch (error) {
+    console.error('Error creating partner:', error);
+    res.status(500).json({ message: 'Failed to create partner', error });
+  }
 };
 
 // READ ALL
-export const getAllPartners = (_, res) => {
-  db.query('SELECT * FROM transport_partner', (err, results) => {
-    if (err) return res.status(500).send(err);
-    res.json(results);
-  });
+export const getAllPartners = async (_, res) => {
+  try {
+    const partners = await partnerService.getAllPartners();
+    res.json(partners);
+  } catch (error) {
+    console.error('Error fetching partners:', error);
+    res.status(500).json({ message: 'Failed to fetch partners', error });
+  }
 };
 
 // READ ONE
-export const getPartnerById = (req, res) => {
-  db.query('SELECT * FROM transport_partner WHERE transport_id = ?', [req.params.id], (err, result) => {
-    if (err) return res.status(500).send(err);
-    if (!result.length) return res.status(404).send('Not found');
-    res.json(result[0]);
-  });
+export const getPartnerById = async (req, res) => {
+  try {
+    const partner = await partnerService.getPartnerById(req.params.id);
+    if (!partner) return res.status(404).json({ message: 'Partner not found' });
+    res.json(partner);
+  } catch (error) {
+    console.error('Error fetching partner:', error);
+    res.status(500).json({ message: 'Failed to fetch partner', error });
+  }
 };
 
 // UPDATE
-export const updatePartner = (req, res) => {
-  const partner = req.body;
-  const sql = `UPDATE transport_partner SET 
-    name = ?, business_name = ?, contact_person = ?, phone = ?, alternate_phone = ?, email = ?, 
-    address_line = ?, city = ?, state = ?, pin_code = ?, pan_number = ?, gst_number = ?, 
-    vehicle_details = ?, rate_per_km = ?, base_rate = ?, is_active = ?, 
-    updated_at = NOW(), updated_by = ? WHERE transport_id = ?`;
-
-  const values = [
-    partner.name, partner.business_name, partner.contact_person, partner.phone, partner.alternate_phone,
-    partner.email, partner.address_line, partner.city, partner.state, partner.pin_code,
-    partner.pan_number, partner.gst_number, JSON.stringify(partner.vehicle_details),
-    partner.rate_per_km, partner.base_rate, partner.is_active, partner.updated_by,
-    req.params.id
-  ];
-
-  db.query(sql, values, (err, result) => {
-    if (err) return res.status(500).send(err);
-    res.json({ message: 'Partner updated' });
-  });
+export const updatePartner = async (req, res) => {
+  try {
+    await partnerService.updatePartner(req.params.id, req.body);
+    res.json({ message: 'Partner updated successfully' });
+  } catch (error) {
+    console.error('Error updating partner:', error);
+    res.status(500).json({ message: 'Failed to update partner', error });
+  }
 };
 
 // DELETE
-export const deletePartner = (req, res) => {
-  db.query('DELETE FROM transport_partner WHERE transport_id = ?', [req.params.id], (err) => {
-    if (err) return res.status(500).send(err);
-    res.json({ message: 'Partner deleted' });
-  });
+export const deletePartner = async (req, res) => {
+  try {
+    await partnerService.deletePartner(req.params.id);
+    res.json({ message: 'Partner deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting partner:', error);
+    res.status(500).json({ message: 'Failed to delete partner', error });
+  }
 };

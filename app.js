@@ -13,7 +13,7 @@ express.json();
 
 // Routes
 // app.use('/api/v1/operations/users', userRoutes);
-app.use('/api/v1/operations/transport', userRoutes);
+app.use('/api/v1/operations/transport', transportRoutes);
 
 // Start
 app.listen(PORT, () => {
